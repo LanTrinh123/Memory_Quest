@@ -1,0 +1,443 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Memory Quest • Pastel Adventure</title>
+<style>
+
+:root{--ink:#35466b;--pink:#ef80a5;--blue:#71b7e9;--lav:#aa90dc;--cream:#fffaf2;--stroke:#ffffff;--softshadow:0 8px 22px rgba(77,108,132,.15)}
+*{box-sizing:border-box}html{min-height:100%}body{margin:0;min-height:100vh;display:flex;justify-content:center;background:#d5ecf4;font-family:'Trebuchet MS',system-ui,sans-serif;color:var(--ink)}button{font:inherit;cursor:pointer;touch-action:manipulation}
+.shell{width:min(100%,460px);min-height:100dvh;position:relative;overflow:hidden;background:#bde6f6 url('assets/backgrounds/home.webp') center center/cover no-repeat;box-shadow:0 8px 40px #456e8d33;isolation:isolate}
+.shell::before{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,#d5f0ff25 0%,#fff8ee3d 53%,#e1f3cf20 100%);pointer-events:none}
+.shell.result-bg.win{background-image:url('assets/backgrounds/win.webp')}.shell.result-bg.lose{background-image:url('assets/backgrounds/lose.webp')}
+.screen{display:none;min-height:100dvh;padding:20px 22px 28px;position:relative}.screen.active{display:flex;flex-direction:column;animation:appear .24s ease}@keyframes appear{from{opacity:.5;transform:translateY(7px)}to{opacity:1;transform:none}}
+.center{text-align:center}.head{display:flex;align-items:center;gap:10px;margin-bottom:16px;min-height:49px}.head h1{font-size:clamp(23px,5.6vw,30px);margin:0;flex:1;text-align:center;color:#374b7b;text-shadow:0 2px 0 #fff}.circle{width:43px;height:43px;flex-shrink:0;border:2px solid white;background:#fffaf4ee;border-radius:50%;box-shadow:0 3px 9px #7c9db844;color:#40527a;font-size:23px;font-weight:900}
+.btn{border:2px solid #fff;color:#fff;font-weight:900;text-shadow:0 1px 2px #64566a4a;border-radius:999px;padding:13px 15px;min-height:49px;box-shadow:0 3px 0 #fff,0 6px 13px #6b8eae4c;transition:transform .16s,filter .16s}.btn:hover{filter:brightness(1.05);transform:translateY(-2px)}.btn:active{transform:translateY(1px)}.pink{background:linear-gradient(180deg,#ffaac6,#ed729c)}.blue{background:linear-gradient(180deg,#96d9ff,#5aabed)}.purple{background:linear-gradient(180deg,#c9b7f9,#9b7cda)}.gold{background:linear-gradient(180deg,#ffdf91,#f8b74e)}.btn:disabled{opacity:.52;cursor:default}
+.welcome{align-items:center;justify-content:center;gap:clamp(15px,3.8vh,32px);padding-top:clamp(25px,7vh,72px);padding-bottom:clamp(28px,7vh,65px)}.logo{display:block;width:min(100%,350px);max-height:185px;object-fit:contain;filter:drop-shadow(0 4px 2px #fff9)}.mascot{display:block;width:min(92%,315px);height:clamp(175px,29vh,250px);object-fit:contain;filter:drop-shadow(0 6px 4px #6b9a8044);animation:bob 3s ease-in-out infinite}@keyframes bob{50%{transform:translateY(-7px)}}.welcome-buttons{display:grid;gap:13px;width:min(100%,292px);margin-top:2px}.welcome-buttons .btn{font-size:17px}
+.sub{margin:0 0 16px;text-align:center;font-size:14px;background:#fffaf4b8;border-radius:20px;padding:7px 10px}.glass{background:rgba(255,251,244,.88);border:2px solid white;border-radius:22px;box-shadow:var(--softshadow);backdrop-filter:blur(7px)}
+.choice{display:flex;align-items:center;gap:12px;width:100%;margin:9px 0;padding:15px;border:2px solid white;border-radius:23px;text-align:left;color:var(--ink);box-shadow:var(--softshadow);min-height:105px;transition:transform .15s}.choice:hover,.topic:hover{transform:translateY(-2px)}.choice .emoji{font-size:33px}.choice strong{display:block;font-size:20px}.choice small{display:block;margin-top:4px;font-size:12px;line-height:1.5}.choice .tiles{margin-left:auto;font-size:27px;opacity:.45}.choice.selected,.topic.selected{outline:3px solid #9f8add;outline-offset:1px}.choice.easy{background:#e7f8e2f0}.choice.medium{background:#def1fff0}.choice.hard{background:#ffe6edf0}.stack-bottom{margin-top:auto;padding-top:18px}.full{width:100%}
+.topic-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.topic{border:2px solid white;border-radius:22px;padding:16px 8px;background:#fffaf1ed;box-shadow:var(--softshadow);font-weight:900;color:var(--ink);min-height:106px;transition:transform .15s}.topic .symbol{font-size:35px;display:block;margin-bottom:6px}.topic.selected{background:#f2e9ff}.topic:last-child:nth-child(odd){grid-column:1/-1}
+.step{display:flex;gap:11px;align-items:center;padding:12px;margin:7px 0;min-height:72px}.step .n{border-radius:50%;width:30px;height:30px;display:grid;place-items:center;background:#8baee3;color:white;font-weight:900;flex-shrink:0}.step .pic{font-size:26px;flex-shrink:0}.step strong{display:block;font-size:14px}.step small{display:block;margin-top:3px;font-size:12px;line-height:1.45}.guide-img{width:145px;height:92px;object-fit:contain;align-self:center;margin-top:4px}
+.game{padding:16px 17px 22px}.game .head{margin-bottom:8px}.pill{background:#fffaf1ed;border:2px solid #fff;padding:8px 14px;border-radius:999px;font-weight:900;font-size:14px;box-shadow:0 3px 9px #7794ae26}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:8px 0 13px}.stat{padding:9px 2px;text-align:center;background:#fffaf3f2;border:2px solid #fff;border-radius:16px;box-shadow:0 3px 9px #7697b533}.stat small{display:block;font-size:11px}.stat strong{display:block;font-size:20px;margin-top:2px}
+.board{display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));gap:clamp(5px,1.4vw,9px);width:100%;max-width:430px;margin:0 auto}.card{border:0;background:none;padding:0;aspect-ratio:1;perspective:800px;min-width:0}.inner{display:block;width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .38s ease}.card.flipped .inner,.card.matched .inner{transform:rotateY(180deg)}.face{position:absolute;inset:0;display:grid;place-items:center;overflow:hidden;border:2px solid #fff;border-radius:17%;backface-visibility:hidden;box-shadow:0 3px 6px #7b9bb64a}.face.front{background:linear-gradient(145deg,#c9d8f9,#92b3e4);color:#eef3ff;font-size:clamp(18px,5vw,31px);text-shadow:0 2px 3px #849dcd66}.face.back{background:#fff9ed;transform:rotateY(180deg)}.face.back img{width:100%;height:100%;object-fit:cover;display:block}.card.matched .back{border-color:#a4d9b5;box-shadow:0 0 0 2px #d4f6df,0 3px 8px #729a8355}.card:focus-visible,.btn:focus-visible,.choice:focus-visible,.topic:focus-visible{outline:3px solid #f5bd54;outline-offset:3px}
+.progress{height:11px;background:#fffaf2d9;border:1px solid #fff;border-radius:20px;overflow:hidden;margin-top:13px}.progress>div{height:100%;width:0;background:linear-gradient(90deg,#f6a3c0,#b0a2eb);transition:width .25s}.progress-label{text-align:center;font-weight:800;font-size:13px;margin:8px 0;background:#fffaf2ba;border-radius:20px;padding:5px}.notice{font-size:13px;text-align:center;min-height:24px;font-weight:800;margin:0;text-shadow:0 1px #fff}.game-buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:auto;padding-top:12px}.game-buttons .btn{padding:12px 6px;font-size:14px}
+.overlay{position:absolute;inset:0;z-index:10;display:none;align-items:center;justify-content:center;background:#ffffffb8;backdrop-filter:blur(9px);padding:24px}.overlay.show{display:flex}.overlay .glass{width:100%;padding:26px;text-align:center}.overlay h2{font-size:27px}.overlay .btn{margin:8px 0}
+.result{align-items:center;justify-content:center;gap:clamp(12px,2.8vh,23px);padding-top:30px;padding-bottom:30px}.banner{width:min(100%,370px);max-height:170px;object-fit:contain;filter:drop-shadow(0 3px 2px #fff7)}.result-mascot{width:min(95%,325px);height:clamp(185px,29vh,255px);object-fit:contain;filter:drop-shadow(0 5px 4px #7898a044)}.result-stats{width:100%;display:grid;grid-template-columns:repeat(3,1fr);padding:15px 5px;gap:0}.result-stats>div{text-align:center;border-right:1px solid #dfe4eb}.result-stats>div:last-child{border:0}.result-stats small{display:block;font-size:11px}.result-stats strong{font-size:19px}.result-actions{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:12px}.result-actions .btn{font-size:13px;padding:12px 5px}.result-actions .wide{grid-column:1/-1;width:83%;justify-self:center}.result-msg{text-align:center;font-weight:800;margin:0;background:#fffaf1ce;border-radius:22px;padding:7px 14px}
+@media(max-width:370px){.screen{padding:14px 12px 23px}.game{padding:13px 10px 19px}.choice{padding:11px}.board{gap:4px}.stat strong{font-size:18px}.game-buttons .btn{font-size:12px}.result-mascot{height:185px}.banner{max-height:140px}}@media(min-width:600px){.shell{margin:18px 0;border-radius:27px;min-height:calc(100dvh - 36px)}.screen{min-height:calc(100dvh - 36px)}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+
+/* V3: coherent pastel art direction, unobstructed illustrations */
+:root {
+  --ink:#354d70;
+  --pink:#ee83a8;
+  --blue:#71b7e9;
+  --lav:#a992df;
+  --softshadow:0 5px 15px rgba(75,105,140,.13);
+}
+body {background:#d7eff7}
+.shell {
+  background-color:#d3effb;
+  background-position:center center;
+  background-size:cover;
+}
+.shell::before {display:none !important}
+.screen {isolation:isolate}
+.welcome {gap:clamp(10px,2.6vh,23px)}
+.logo {
+  width:min(94%,350px);
+  max-height:160px;
+  filter:drop-shadow(0 2px 2px rgba(255,255,255,.5));
+}
+.mascot {
+  width:min(100%,355px);
+  height:clamp(185px,32vh,270px);
+  object-fit:contain;
+  filter:none;
+}
+.guide-img {
+  width:min(80%,235px);
+  height:125px;
+  object-fit:contain;
+  filter:none;
+}
+.result-mascot {
+  width:min(100%,350px);
+  height:clamp(190px,31vh,280px);
+  object-fit:contain;
+  filter:none;
+}
+.banner {filter:none}
+.btn {
+  border:2px solid #fff;
+  box-shadow:0 3px 0 rgba(255,255,255,.9),0 6px 12px rgba(95,125,153,.23);
+}
+.glass,.stat,.pill,.topic,.choice,.sub,.result-msg,.progress-label {
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+}
+.glass {background:rgba(255,252,246,.93)}
+.choice.easy {background:#e7f7e4}
+.choice.medium {background:#e3f3fc}
+.choice.hard {background:#ffe8ef}
+.topic {background:#fff9f0}
+.topic.selected {background:#eee7fa}
+.stat,.pill {background:#fffaf4f5}
+.face.front {background:linear-gradient(155deg,#c7d7f8,#91b3e5)}
+.face.back {background:#fff9ee}
+.face.back img {object-fit:cover}
+.result-stats {background:#fffaf4f5}
+@media(max-width:370px){
+  .logo{max-height:132px}
+  .mascot{height:185px}
+  .result-mascot{height:185px}
+}
+
+
+.leaderboard-wrap{width:100%;padding:15px;margin:8px 0}
+.leaderboard-title{text-align:center;margin:4px 0 12px;font-size:18px}
+.leaderboard-list{list-style:none;padding:0;margin:0;display:grid;gap:7px}
+.leaderboard-row{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:8px;align-items:center;padding:9px 10px;border-radius:14px;background:#fffdf8;border:1px solid #f1e7da;font-size:13px}
+.leaderboard-row .rank{font-weight:900;color:#9678c9;text-align:center}
+.leaderboard-row .player{font-weight:800;overflow-wrap:anywhere}
+.leaderboard-row .meta{display:block;font-size:10px;font-weight:500;opacity:.72;margin-top:2px}
+.leaderboard-row .points{font-weight:900;color:#d77a9b;white-space:nowrap}
+.player-name{width:100%;border:2px solid #fff;border-radius:14px;padding:11px 12px;margin:8px 0;background:#fffdf8;color:var(--ink);font:inherit;outline-color:#a992df}
+.empty-rank{text-align:center;padding:18px 8px;font-size:13px;opacity:.75}
+.rank-actions{display:grid;gap:10px;width:100%}
+@media(min-width:600px){.shell{width:min(100%,500px)}}
+
+
+.score-breakdown{margin:-5px 0 0;padding:8px 12px;text-align:center;border-radius:14px;background:#fffaf1d9;font-size:12px;line-height:1.55;font-weight:700}
+.leaderboard-row .meta{line-height:1.4}
+@media(max-width:370px){.leaderboard-wrap{padding:10px}.leaderboard-row{padding:8px 6px;gap:5px;font-size:12px}.leaderboard-row .points{font-size:12px}}
+@media(min-width:600px){.screen{padding-left:25px;padding-right:25px}.board{max-width:440px}}
+
+
+/* Audio controls: added without changing game layout or mechanics */
+.mq-audio-toggle{
+  position:absolute;top:12px;right:12px;z-index:30;
+  min-width:39px;height:39px;padding:0 10px;border:2px solid #fff;
+  border-radius:999px;background:#fffaf4;color:#40527a;
+  box-shadow:0 3px 9px #7c9db844;font-size:17px;font-weight:900;
+  display:flex;align-items:center;justify-content:center;
+}
+.game .head{padding-right:43px}
+.mq-audio-toggle:focus-visible{outline:3px solid #f5bd54;outline-offset:3px}
+
+</style></head><body><main class="shell" id="shell">
+<section class="screen welcome active" id="welcome"><img class="logo" src="assets/interface/logo.png" alt="Memory Quest – Lật thẻ, Ghi nhớ, Chinh phục thử thách!"><img class="mascot" src="assets/interface/welcome.png" alt="Mèo và gà con đáng yêu"><div class="welcome-buttons"><button class="btn pink" id="startBtn">▶ Bắt đầu chơi</button><button class="btn blue" id="guideBtn">📖 Hướng dẫn chơi</button><button class="btn purple" id="difficultyBtn">⚙️ Cài đặt độ khó</button><button class="btn gold" id="leaderboardBtn">🏆 Bảng xếp hạng Top 10</button></div></section>
+<section class="screen" id="difficulty"><div class="head"><button class="circle" data-go="welcome" aria-label="Quay lại">←</button><h1>👑 Chọn độ khó</h1><span style="width:44px"></span></div><p class="sub">Hãy chọn cấp độ phù hợp với bạn!</p><button class="choice easy selected" data-level="easy"><span class="emoji">🌱</span><span><strong>Dễ</strong><small>Bảng 4 × 4 (8 cặp)<br>Không giới hạn thời gian</small></span><span class="tiles">▦</span></button><button class="choice medium" data-level="medium"><span class="emoji">⭐</span><span><strong>Trung bình</strong><small>Bảng 4 × 5 (10 cặp)<br>120 giây</small></span><span class="tiles">▦</span></button><button class="choice hard" data-level="hard"><span class="emoji">👑</span><span><strong>Khó</strong><small>Bảng 6 × 6 (18 cặp)<br>90 giây</small></span><span class="tiles">▦</span></button><div class="stack-bottom"><button class="btn purple full" id="nextTopic">Tiếp theo: Chọn chủ đề →</button></div></section>
+<section class="screen" id="topics"><div class="head"><button class="circle" data-go="difficulty" aria-label="Quay lại">←</button><h1>🎨 Chọn chủ đề</h1><span style="width:44px"></span></div><p class="sub">Mỗi ván sẽ xáo trộn hình ảnh trong chủ đề đã chọn.</p><div class="topic-grid"><button class="topic selected" data-topic="animals"><span class="symbol">🐱</span>Động vật</button><button class="topic" data-topic="flowers"><span class="symbol">🌸</span>Hoa</button><button class="topic" data-topic="fruits"><span class="symbol">🍓</span>Rau củ & trái cây</button><button class="topic" data-topic="vehicles"><span class="symbol">🚗</span>Phương tiện</button><button class="topic" data-topic="nature"><span class="symbol">🌈</span>Thiên nhiên & vũ trụ</button></div><div class="stack-bottom"><button class="btn pink full" id="playSelected">▶ Bắt đầu!</button></div></section>
+<section class="screen" id="guide"><div class="head"><button class="circle" data-go="welcome" aria-label="Quay lại">←</button><h1>📖 Hướng dẫn chơi</h1><span style="width:44px"></span></div><p class="sub">Ghi nhớ vị trí và tìm các cặp thẻ giống nhau!</p><div class="glass step"><span class="pic">❔</span><span class="n">1</span><div><strong>Nhấn vào thẻ</strong><small>Chọn một thẻ để lật và xem hình.</small></div></div><div class="glass step"><span class="pic">🐱</span><span class="n">2</span><div><strong>Tìm cặp giống nhau</strong><small>Mỗi lượt chỉ được mở hai thẻ.</small></div></div><div class="glass step"><span class="pic">💚</span><span class="n">3</span><div><strong>Ghép đúng</strong><small>Hai thẻ giống nhau sẽ được giữ mở và cộng 100 điểm.</small></div></div><div class="glass step"><span class="pic">🔁</span><span class="n">4</span><div><strong>Ghép sai</strong><small>Hai thẻ tự úp lại sau một giây, trừ 5 điểm (không âm).</small></div></div><div class="glass step"><span class="pic">🏆</span><span class="n">5</span><div><strong>Chiến thắng</strong><small>Tìm đủ cặp trước khi hết thời gian ở cấp độ có giới hạn.</small></div></div><img class="guide-img" src="assets/interface/bunny.png" alt="Thỏ và biểu tượng trò chơi"><div class="stack-bottom"><button class="btn pink full" id="guidePlay">Đã hiểu, bắt đầu thôi!</button></div></section>
+<section class="screen game" id="game"><div class="head"><button class="circle" id="homeBtn" aria-label="Về menu">←</button><span class="pill" id="levelName">🌱 Dễ · 4 × 4</span><button class="circle" id="pauseBtn" aria-label="Tạm dừng">Ⅱ</button></div><div class="stats"><div class="stat"><small>⏰ Thời gian</small><strong id="time">00:00</strong></div><div class="stat"><small>👣 Số lượt</small><strong id="moves">0</strong></div><div class="stat"><small>⭐ Điểm số</small><strong id="score">0</strong></div></div><div class="board" id="board" aria-label="Bảng ghép cặp"></div><div class="progress"><div id="progressFill"></div></div><p class="progress-label" id="pairs">Đã tìm 0/8 cặp</p><p class="notice" id="notice" aria-live="polite"></p><div class="game-buttons"><button class="btn blue" id="replayBtn">↻ Chơi lại</button><button class="btn gold" id="hintBtn">💡 Gợi ý (3)</button></div><div class="overlay" id="pauseOverlay"><div class="glass"><h2>⏸️ Tạm dừng</h2><p>Hãy nghỉ ngơi một chút nhé! 🌼</p><button class="btn pink full" id="resumeBtn">▶ Tiếp tục</button><button class="btn purple full" id="pauseHomeBtn">⌂ Về menu</button></div></div></section>
+<section class="screen result" id="result"><img class="banner" id="resultBanner" src="assets/interface/win-banner.png" alt="Chúc mừng"><img class="result-mascot" id="resultMascot" src="assets/interface/win-cat.png" alt="Nhân vật kết quả"><p class="result-msg" id="resultMsg"></p><p class="score-breakdown" id="scoreBreakdown" aria-live="polite"></p><label for="playerName" style="font-weight:800;font-size:13px">Tên hiển thị trên bảng xếp hạng</label><input class="player-name" id="playerName" maxlength="18" autocomplete="nickname" placeholder="Nhập tên của bạn"><div class="glass result-stats"><div><small id="resultTimeLabel">⏰ Thời gian</small><strong id="finalTime">00:00</strong></div><div><small>👣 Số lượt</small><strong id="finalMoves">0</strong></div><div><small>⭐ Điểm số</small><strong id="finalScore">0</strong></div></div><div class="result-actions"><button class="btn pink" id="resultReplay">↻ Chơi lại</button><button class="btn blue" id="resultTopics">▦ Chọn chủ đề</button><button class="btn gold" id="resultLeaderboard">🏆 Top 10</button><button class="btn purple wide" id="resultHome">⌂ Về màn hình chính</button></div></section>
+
+<section class="screen" id="leaderboard">
+  <div class="head"><button class="circle" data-go="welcome" aria-label="Quay lại">←</button><h1>🏆 Top 10</h1><span style="width:44px"></span></div>
+  <p class="sub">Những thành tích cao nhất trên thiết bị này</p>
+  <div class="glass leaderboard-wrap">
+    <h2 class="leaderboard-title">🌟 BẢNG XẾP HẠNG 🌟</h2>
+    <ol class="leaderboard-list" id="leaderboardList"></ol>
+  </div>
+  <p class="sub">Điểm được lưu tự động sau mỗi ván chơi. Dữ liệu được lưu trên trình duyệt hiện tại.</p>
+  <div class="stack-bottom rank-actions"><button class="btn gold full" id="clearLeaderboard">🗑️ Xóa bảng xếp hạng</button><button class="btn pink full" id="leaderboardPlay">▶ Chơi ngay</button></div>
+</section>
+</main><script>
+'use strict';
+// Hình ảnh gốc được đặt trong assets/cards/<chủ đề>/<tên file>.jpg
+const CARD_FILES={
+animals:['cao','chim canh cut','cho','chuot','cuu','gau truc','gau','hamster','heo','ho','huou','khi','koala','nhim','rai ca','su tu','tho','vit','voi'],
+flowers:['anh dao','anh tuc','cam tu','chuong xanh','chuong','cuc','dong tien','hong','huong duong','ly','nhai','oai huong','phong lan','ram but','sen','sung','tulip','van tho','xuong rong'],
+fruits:['bap','ca chua','ca rot','cam','chanh','chuoi','dao','dau','dua hau','dua','hanh','khoai tay','kiwi','nam','nho','ot chuong','sup lo','tao','toi','viet quat'],
+vehicles:['cuu thuong(1)','khinh khi cau(1)','may bay(1)','oto(1)','tau dien(1)','tau hoa(1)','tau ngam(1)','tau thuy(1)','ten lua do(1)','ten lua xanh(1)','thuyen buom(1)','truc thang(1)','xe buyt','xe dap','xe lua','xe may','xe tai','xe tang'],
+nature:['cau vong','chop','cuc quang','gio','giong bao','hoang hon','loc xoay','mat troi','may mu','may','mua','nui lua','sao','song','tau','thien thach','trang','tuyet']};
+const LEVELS={easy:{rows:4,cols:4,seconds:null,label:'🌱 Dễ · 4 × 4'},medium:{rows:5,cols:4,seconds:120,label:'⭐ Trung bình · 4 × 5'},hard:{rows:6,cols:6,seconds:90,label:'👑 Khó · 6 × 6'}};
+const $=id=>document.getElementById(id);let level='easy',topic='animals',deck=[],first=null,second=null,locked=false,matched=0,moves=0,score=0,elapsed=0,remaining=null,hints=3,paused=false,active=false,timer=null,flipTimer=null,hintTimer=null,session=0;
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id===id));$('shell').className='shell'+(id==='result'?' result-bg '+(resultWon?'win':'lose'):'');}
+
+let resultWon=true,usedHints=0,timeBonus=0,difficultyBonus=0,hintPenalty=0;
+const RANK_KEY='memoryQuestTop10_v2';
+let latestRecordId=null;
+
+function safeGet(key,fallback=''){
+  try{return localStorage.getItem(key)??fallback;}catch(_){return fallback;}
+}
+function safeSet(key,value){
+  try{localStorage.setItem(key,value);return true;}catch(_){return false;}
+}
+function readRanks(){
+  try{
+    const data=JSON.parse(localStorage.getItem(RANK_KEY)||'[]');
+    return Array.isArray(data)?data.filter(x=>x&&Number.isFinite(Number(x.score))):[];
+  }catch(_){return [];}
+}
+function writeRanks(rows){
+  try{localStorage.setItem(RANK_KEY,JSON.stringify(rows));return true;}
+  catch(_){return false;}
+}
+function renderRanks(){
+  const list=$('leaderboardList');if(!list)return;
+  const rows=readRanks().sort((a,b)=>Number(b.score)-Number(a.score)||Number(a.moves)-Number(b.moves)||Number(a.elapsed)-Number(b.elapsed)).slice(0,10);
+  list.replaceChildren();
+  if(!rows.length){
+    const li=document.createElement('li');li.className='empty-rank';
+    li.textContent='Chưa có thành tích nào. Hãy chơi và ghi tên mình lên bảng nhé!';
+    list.append(li);return;
+  }
+  rows.forEach((r,i)=>{
+    const li=document.createElement('li');li.className='leaderboard-row';
+    const rank=document.createElement('span');rank.className='rank';rank.textContent=['🥇','🥈','🥉'][i]||String(i+1);
+    const player=document.createElement('span');player.className='player';player.textContent=r.name||'Người chơi';
+    const meta=document.createElement('span');meta.className='meta';
+    meta.textContent=`${r.level||''} · ${r.topic||''} · ${r.moves||0} lượt · ${r.date||''}`;
+    player.append(meta);
+    const points=document.createElement('span');points.className='points';points.textContent=`${Number(r.score)||0} điểm`;
+    li.append(rank,player,points);list.append(li);
+  });
+}
+function saveResult(){
+  const name=(safeGet('memoryQuestPlayerName','Người chơi').trim().slice(0,18)||'Người chơi');
+  const rows=readRanks();
+  latestRecordId=`${Date.now()}-${Math.random().toString(36).slice(2,8)}`;
+  rows.push({
+    id:latestRecordId,name,score,moves,elapsed,usedHints,
+    timeBonus,difficultyBonus,hintPenalty,won:resultWon,
+    level:({easy:'Dễ',medium:'Trung bình',hard:'Khó'})[level],
+    topic:({animals:'Động vật',flowers:'Hoa',fruits:'Rau củ & trái cây',vehicles:'Phương tiện',nature:'Thiên nhiên & vũ trụ'})[topic],
+    date:new Date().toLocaleDateString('vi-VN')
+  });
+  rows.sort((a,b)=>Number(b.score)-Number(a.score)||Number(a.moves)-Number(b.moves)||Number(a.elapsed)-Number(b.elapsed));
+  const saved=writeRanks(rows.slice(0,10));
+  $('playerName').value=name;
+  if(!saved)$('scoreBreakdown').textContent+=' · Không thể lưu do trình duyệt chặn bộ nhớ cục bộ.';
+}
+function renameLatestRecord(value){
+  const name=(value||'Người chơi').trim().slice(0,18)||'Người chơi';
+  safeSet('memoryQuestPlayerName',name);
+  if(!latestRecordId)return;
+  const rows=readRanks();const row=rows.find(x=>x.id===latestRecordId);
+  if(row){row.name=name;writeRanks(rows);renderRanks();}
+}
+function clearLeaderboard(){
+  if(!confirm('Bạn có chắc muốn xóa toàn bộ Top 10 trên thiết bị này?'))return;
+  if(safeSet(RANK_KEY,'[]'))renderRanks();
+  else alert('Không thể xóa dữ liệu. Vui lòng kiểm tra cài đặt trình duyệt.');
+}
+function calculateFinalScore(won){
+  // Giữ điểm nền hiện tại: ghép đúng +100, ghép sai -5.
+  timeBonus=won&&remaining!==null?remaining*2:0;
+  difficultyBonus=won?({easy:0,medium:100,hard:250})[level]:0;
+  hintPenalty=usedHints*25;
+  score=Math.max(0,score+timeBonus+difficultyBonus-hintPenalty);
+  $('scoreBreakdown').textContent=`Điểm ghép cặp: ${Math.max(0,score-timeBonus-difficultyBonus+hintPenalty)} · Thưởng thời gian: +${timeBonus} · Thưởng độ khó: +${difficultyBonus} · Phạt gợi ý: −${hintPenalty}`;
+}
+
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function fmt(n){return String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');}
+function cleanup(){clearInterval(timer);clearTimeout(flipTimer);clearTimeout(hintTimer);timer=flipTimer=hintTimer=null;session++;}
+function leave(id){cleanup();active=false;paused=false;$('pauseOverlay').classList.remove('show');show(id);}
+function stats(){ $('time').textContent=fmt(remaining===null?elapsed:remaining);$('moves').textContent=moves;$('score').textContent=score;$('pairs').textContent=`Đã tìm ${matched}/${deck.length/2} cặp`;$('progressFill').style.width=deck.length?`${matched*200/deck.length}%`:'0%';$('hintBtn').textContent=`💡 Gợi ý (${hints})`;$('hintBtn').disabled=!active||paused||locked||!!first||hints===0;}
+function start(){if(window.MQSound)MQSound.play('start');cleanup();const cfg=LEVELS[level],count=cfg.rows*cfg.cols/2,files=shuffle(CARD_FILES[topic]).slice(0,count);deck=shuffle([...files,...files]);first=second=null;locked=false;matched=moves=score=elapsed=0;usedHints=timeBonus=difficultyBonus=hintPenalty=0;remaining=cfg.seconds;hints=3;paused=false;active=true;$('pauseOverlay').classList.remove('show');$('levelName').textContent=cfg.label;$('notice').textContent='Hãy tìm các cặp giống nhau nhé! 🌷';const board=$('board');board.replaceChildren();board.style.setProperty('--cols',cfg.cols);
+deck.forEach((symbol,i)=>{const card=document.createElement('button');card.type='button';card.className='card';card.dataset.symbol=symbol;card.setAttribute('aria-label',`Thẻ ${i+1} đang úp`);const inner=document.createElement('span');inner.className='inner';const front=document.createElement('span');front.className='face front';front.textContent='🐾';const back=document.createElement('span');back.className='face back';const img=document.createElement('img');img.src=`assets/cards/${topic}/${encodeURIComponent(symbol)}.jpg`;img.alt='';img.draggable=false;back.append(img);inner.append(front,back);card.append(inner);card.onclick=()=>flip(card);board.append(card);});stats();show('game');const s=session;timer=setInterval(()=>{if(!active||paused||s!==session)return;elapsed++;if(remaining!==null){remaining=Math.max(0,remaining-1);if(remaining===0){stats();finish(false);return;}}stats();},1000);}
+function flip(card){if(!active||paused||locked||card===first||card.classList.contains('matched')||card.classList.contains('flipped'))return;if(window.MQSound)MQSound.play('flip');card.classList.add('flipped');card.setAttribute('aria-label','Thẻ '+card.dataset.symbol);if(!first){first=card;stats();return;}second=card;moves++;locked=true;if(first.dataset.symbol===second.dataset.symbol){first.classList.add('matched');second.classList.add('matched');first.disabled=second.disabled=true;matched++;score+=100;if(window.MQSound)MQSound.play('match');$('notice').textContent='🎉 Ghép đúng! +100 điểm';first=second=null;locked=false;stats();if(matched===deck.length/2)finish(true);}else{score=Math.max(0,score-5);if(window.MQSound)MQSound.play('mismatch');$('notice').textContent='🌸 Chưa đúng, thử lại nhé!';stats();const a=first,b=second,s=session;flipTimer=setTimeout(()=>{if(s!==session)return;a.classList.remove('flipped');b.classList.remove('flipped');first=second=null;locked=false;flipTimer=null;stats();},1000);}}
+function hint(){if(!active||paused||locked||first||hints===0)return;if(window.MQSound)MQSound.play('hint');const cards=[...document.querySelectorAll('.card:not(.matched)')],a=cards[0];if(!a)return;const b=cards.find(c=>c!==a&&c.dataset.symbol===a.dataset.symbol);if(!b)return;hints--;usedHints++;locked=true;a.classList.add('flipped');b.classList.add('flipped');$('notice').textContent='💡 Hãy ghi nhớ vị trí hai thẻ này!';stats();const s=session;hintTimer=setTimeout(()=>{if(s!==session)return;a.classList.remove('flipped');b.classList.remove('flipped');locked=false;hintTimer=null;stats();},1300);}
+function finish(won){if(!active)return;if(window.MQSound)MQSound.play(won?'win':'lose');active=false;cleanup();resultWon=won;calculateFinalScore(won);saveResult();$('resultBanner').src=`assets/interface/${won?'win':'lose'}-banner.png`;$('resultMascot').src=`assets/interface/${won?'win':'lose'}-cat.png`;$('resultMsg').textContent=won?'Bạn đã hoàn thành trò chơi! 🎉':`Bạn đã ghép được ${matched}/${deck.length/2} cặp. Hãy thử lại nhé!`;$('resultTimeLabel').textContent=won?'⏰ Thời gian':'⭐ Số cặp';$('finalTime').textContent=won?fmt(elapsed):`${matched}/${deck.length/2}`;$('finalMoves').textContent=moves;$('finalScore').textContent=score;show('result');}
+$('startBtn').onclick=()=>show('difficulty');$('leaderboardBtn').onclick=()=>{renderRanks();show('leaderboard');};$('resultLeaderboard').onclick=()=>{renderRanks();show('leaderboard');};$('leaderboardPlay').onclick=()=>show('difficulty');$('clearLeaderboard').onclick=clearLeaderboard;$('playerName').value=safeGet('memoryQuestPlayerName','');$('playerName').addEventListener('input',e=>renameLatestRecord(e.target.value));$('guideBtn').onclick=()=>show('guide');$('difficultyBtn').onclick=()=>show('difficulty');$('guidePlay').onclick=()=>show('difficulty');document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>leave(b.dataset.go));document.querySelectorAll('[data-level]').forEach(b=>b.onclick=()=>{level=b.dataset.level;document.querySelectorAll('[data-level]').forEach(x=>x.classList.toggle('selected',x===b));});document.querySelectorAll('[data-topic]').forEach(b=>b.onclick=()=>{topic=b.dataset.topic;document.querySelectorAll('[data-topic]').forEach(x=>x.classList.toggle('selected',x===b));});$('nextTopic').onclick=()=>show('topics');$('playSelected').onclick=start;$('homeBtn').onclick=()=>leave('welcome');$('pauseBtn').onclick=()=>{if(!active||paused||locked)return;paused=true;$('pauseOverlay').classList.add('show');stats();};$('resumeBtn').onclick=()=>{paused=false;$('pauseOverlay').classList.remove('show');stats();};$('pauseHomeBtn').onclick=()=>leave('welcome');$('replayBtn').onclick=start;$('hintBtn').onclick=hint;$('resultReplay').onclick=start;$('resultTopics').onclick=()=>leave('topics');$('resultHome').onclick=()=>leave('welcome');
+</script>
+<script>
+/* MEMORY QUEST AUDIO ADD-ON
+   Uses the supplied lo-fi track for background music and Web Audio API
+   for short UI/card effects. Does not modify game rules or scoring. */
+(() => {
+  'use strict';
+  const STORAGE_KEY = 'memoryQuestSoundEnabled';
+  const MUSIC_FILE = 'zephiramusic-lofi-gaming-606302(2).mp3';
+  const shell = document.getElementById('shell');
+  if (!shell) return;
+
+  let enabled = true;
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved !== null) enabled = saved === 'true';
+  } catch (_) {}
+
+  const music = new Audio(MUSIC_FILE);
+  music.loop = true;
+  music.preload = 'auto';
+  music.volume = 0.22;
+
+  let audioCtx = null;
+  let unlocked = false;
+
+  function savePreference() {
+    try { localStorage.setItem(STORAGE_KEY, String(enabled)); } catch (_) {}
+  }
+
+  function updateToggle() {
+    const btn = document.getElementById('mqAudioToggle');
+    if (!btn) return;
+    btn.textContent = enabled ? '🔊' : '🔇';
+    btn.setAttribute('aria-label', enabled ? 'Tắt âm thanh' : 'Bật âm thanh');
+    btn.title = enabled ? 'Tắt âm thanh' : 'Bật âm thanh';
+  }
+
+  function getContext() {
+    if (!audioCtx) {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (Ctx) audioCtx = new Ctx();
+    }
+    return audioCtx;
+  }
+
+  function unlockAudio() {
+    const ctx = getContext();
+    // Call resume() and play() directly inside the user's gesture. This is
+    // important for Safari/iOS and other browsers that block autoplay.
+    if (ctx && ctx.state === 'suspended') {
+      try { ctx.resume().catch(() => {}); } catch (_) {}
+    }
+    unlocked = true;
+    if (enabled) startMusic();
+  }
+
+  function startMusic() {
+    if (!enabled || !unlocked || !music.paused) return;
+    const promise = music.play();
+    if (promise && typeof promise.catch === 'function') {
+      promise.catch(() => {
+        // A later user interaction can retry playback on restrictive browsers.
+      });
+    }
+  }
+
+  function stopMusic() {
+    music.pause();
+  }
+
+  function tone(freq, duration, type='sine', volume=0.045, delay=0, endFreq=null) {
+    if (!enabled) return;
+    const ctx = getContext();
+    if (!ctx) return;
+    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+    const now = ctx.currentTime + delay;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(Math.max(40, freq), now);
+    if (endFreq !== null) {
+      osc.frequency.exponentialRampToValueAtTime(Math.max(40, endFreq), now + duration);
+    }
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(volume, now + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + duration + 0.025);
+  }
+
+  const effects = {
+    // Soft, short wooden/plucky card flip
+    flip() {
+      tone(560, 0.075, 'triangle', 0.026, 0, 760);
+    },
+    // Two bright notes for a correct pair
+    match() {
+      tone(660, 0.16, 'sine', 0.045, 0);
+      tone(880, 0.22, 'sine', 0.042, 0.11);
+      tone(1100, 0.24, 'sine', 0.025, 0.23);
+    },
+    // Gentle low descending sound, not harsh
+    mismatch() {
+      tone(260, 0.16, 'triangle', 0.035, 0, 190);
+      tone(175, 0.14, 'sine', 0.022, 0.10, 145);
+    },
+    // Sparkly hint
+    hint() {
+      tone(740, 0.13, 'sine', 0.035, 0);
+      tone(990, 0.16, 'sine', 0.03, 0.10);
+    },
+    // Friendly start cue
+    start() {
+      tone(523.25, 0.16, 'sine', 0.035, 0);
+      tone(659.25, 0.18, 'sine', 0.035, 0.12);
+      tone(783.99, 0.22, 'sine', 0.035, 0.24);
+    },
+    // Short celebratory win chime
+    win() {
+      tone(523.25, 0.22, 'sine', 0.04, 0);
+      tone(659.25, 0.22, 'sine', 0.04, 0.14);
+      tone(783.99, 0.25, 'sine', 0.04, 0.28);
+      tone(1046.5, 0.42, 'sine', 0.035, 0.43);
+    },
+    // Soft descending ending cue
+    lose() {
+      tone(493.88, 0.20, 'sine', 0.035, 0);
+      tone(392.00, 0.23, 'sine', 0.03, 0.16);
+      tone(329.63, 0.30, 'sine', 0.025, 0.33);
+    },
+    // Quiet tactile click for interface buttons
+    button() {
+      tone(620, 0.045, 'sine', 0.018, 0, 520);
+    }
+  };
+
+  const toggle = document.createElement('button');
+  toggle.type = 'button';
+  toggle.id = 'mqAudioToggle';
+  toggle.className = 'mq-audio-toggle';
+  toggle.textContent = enabled ? '🔊' : '🔇';
+  toggle.setAttribute('aria-label', enabled ? 'Tắt âm thanh' : 'Bật âm thanh');
+  toggle.title = enabled ? 'Tắt âm thanh' : 'Bật âm thanh';
+  shell.appendChild(toggle);
+
+  toggle.addEventListener('click', (event) => {
+    event.stopPropagation();
+    enabled = !enabled;
+    savePreference();
+    updateToggle();
+    if (enabled) {
+      unlockAudio();
+      effects.button();
+    } else {
+      stopMusic();
+    }
+  });
+
+  // Mobile browsers require audio playback to begin after a user gesture.
+  document.addEventListener('pointerdown', () => {
+    if (!unlocked || (enabled && music.paused)) unlockAudio();
+  }, { passive: true });
+
+  // A soft click for navigation/settings buttons. Actions with their own
+  // distinctive sound (flip, hint, starting/restarting a game) are excluded
+  // to avoid stacking two effects at the same instant.
+  const buttonsWithDedicatedSound = new Set([
+    'mqAudioToggle', 'hintBtn', 'playSelected', 'guidePlay',
+    'resultReplay', 'replayBtn'
+  ]);
+  document.addEventListener('click', (event) => {
+    const button = event.target.closest('button');
+    if (!button || buttonsWithDedicatedSound.has(button.id) ||
+        button.classList.contains('card') || button.disabled) return;
+    if (!unlocked || (enabled && music.paused)) unlockAudio();
+    effects.button();
+  });
+
+  // Public event hooks called from the existing game functions below.
+  window.MQSound = {
+    play(name) {
+      if (!enabled) return;
+      if (!unlocked) unlockAudio();
+      if (effects[name]) effects[name]();
+    },
+    setEnabled(value) {
+      enabled = Boolean(value);
+      savePreference();
+      updateToggle();
+      if (enabled) unlockAudio();
+      else stopMusic();
+    },
+    isEnabled() { return enabled; }
+  };
+
+  updateToggle();
+})();
+</script>
+</body></html>
