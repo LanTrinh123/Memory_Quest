@@ -1,7 +1,7 @@
 MEMORY QUEST - PASTEL EDITION V3
 
 1. Giai nen file ZIP.
-2. Mo ca thu muc Memory_Quest_Pastel_V3 trong VS Code.
+2. Mo ca thu muc Memory_Quest trong VS Code.
 3. Mo index.html bang Live Server hoac trinh duyet.
 4. Giu nguyen thu muc assets.
 
